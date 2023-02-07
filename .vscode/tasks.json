@@ -2,21 +2,18 @@
 	"version": "2.0.0",
 	"tasks": [
     {
-      "type": "cppbuild",
+      "type": "process",
       "label": "C/C++: g++.exe build active file",
-      "command": "D:\\C++\\mingw64\\bin\\g++.exe",
+      "command": "g++",
       "args": [
         "${file}",
         "-I${workspaceFolder}/boost_1_81_0",
         "-o",
-        "${fileDirname}\\${fileBasenameNoExtension}.exe"
+        "${fileDirname}/linux-${fileBasenameNoExtension}"
       ],
       "options": {
         "cwd": "${fileDirname}"
       },
-      "problemMatcher": [
-        "$gcc"
-      ],
       "group": {
         "kind": "build",
         "isDefault": true

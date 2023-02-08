@@ -1,5 +1,6 @@
 #include <fstream>
 #include <string>
+#include <filesystem>
 #include "boost/regex.hpp"
 
 #include <iostream>
@@ -103,5 +104,8 @@ int main() {
   output.close();
   input.close();
 
+  std::cout << "Input: " << std::filesystem::file_size("stupid.txt") << std::endl;
+  std::cout << "Output: " << std::filesystem::file_size("Output-2.txt") << std::endl;
+  
   return 0;
 }

@@ -11,8 +11,8 @@ int comments {0};
 
 std::vector<std::string> split(std::string const &str, const char delim) {
     std::vector<std::string> out {};
-    size_t start;
-    size_t end = 0;
+    std::size_t start;
+    std::size_t end = 0;
  
     while ((start = str.find_first_not_of(delim, end)) != std::string::npos)
     {
@@ -55,9 +55,14 @@ std::string removeParenthesis(const boost::smatch &match) {
 
 std::string fixUniStrings(const boost::smatch &match) {
   std::string s = match[0].str();
+  std::string output;
+  std::vector<std::string> splitted {split(s, '\\')};
 
+  for (unsigned short int i = 0; i < splitted.size(); i++) {
+    output += static_cast<char>(std::stoi(splitted[i]));
+  }
 
-  return s.substr(1, s.length() - 2);
+  return output;
 }
 
 int main() {
@@ -70,7 +75,9 @@ int main() {
   boost::regex getAllHexadecimal {"(0x).+?(?=\\W)"};
   boost::regex getNumbers {"(\\-|)[0-9]+(\\s+)[\\+|\\-|\\*|\\/](\\s+)[0-9]*"}; // use this after hex -> int
   boost::regex removeParenthesisReg {"\\([0-9]{1,}\\)"};
-  boost::regex getUniStrings {"\\[\".+?(?=\")\"\\]"}
+  boost::regex getUniStrings {"\\\\(\\d)+"};
+
+  // (?<=string.char\()(.)*\)
 
   input.open("stupid.txt");
 
@@ -85,6 +92,7 @@ int main() {
     }
     curline = boost::regex_replace(curline, getNumbers, doMath); // :numbers
 
+    curline = boost::regex_replace(curline, getUniStrings, fixUniStrings);
 
 
     output << curline << "\n";

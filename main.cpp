@@ -10,6 +10,8 @@ bool debug {false};
 int hex {0};
 int comments {0};
 
+boost::regex getDoubleDot {"\\.\\."};
+
 std::vector<std::string> split(std::string const &str, const char delim) {
     std::vector<std::string> out {};
     std::size_t start;
@@ -78,7 +80,27 @@ std::string fixStringChar(const boost::smatch &match) {
     output += static_cast<char>(std::stoi(splitted[i]));
   }
 
-  std::cout << s << " :-> " << output << std::endl;
+  //std::cout << s << " :-> " << output << std::endl;
+
+  return "\"" + output + "\"";
+}
+
+std::string fixConcatChar(const boost::smatch &match) {
+  std::string s = match[0].str();
+  std::string output {""};
+
+  s = boost::regex_replace(s, getDoubleDot, ".");
+
+  std::vector<std::string> splitted {split(s, '.')};
+
+  std::cout << s << "-:>" << splitted.size() << std::endl;
+
+  for (unsigned short int i = 0; i < splitted.size(); i++) {
+    std::cout << splitted[i].substr(splitted[i].find('"') + 1,1) << "!" << std::endl;
+    output += splitted[i].substr(splitted[i].find('"') + 1,1);//static_cast<char>(std::stoi(splitted[i]));
+  }
+
+  //std::cout << s << " :-> " << output << std::endl;
 
   return "\"" + output + "\"";
 }
@@ -94,7 +116,8 @@ int main() {
   boost::regex getNumbers {"(\\-|)[0-9]+(\\s+)[\\+|\\-|\\*|\\/](\\s+)[0-9]*"}; // use this after hex -> int
   boost::regex removeParenthesisReg {"\\([0-9]{1,}\\)"};
   boost::regex getUniStrings {"\\\\(\\d)+"};
-  boost::regex stringCharRegex {"((_ENV\\[\"string\"\\]\\[\"char\"\\]|string.char)\\((.+?(?=\\)))\\))"};
+  boost::regex stringCharRegex {"((_ENV(\\[(\"|)string(\"|)(\\]|))\\[\"char\"\\]|string.char)\\((.+?(?=\\)))\\))"};
+  boost::regex getConcatChar {"\"c\"(\\s{0,}\\.{0,}\\s{0,})\"h\"(\\s{0,}\\.{0,}\\s{0,})\"a\"(\\s{0,}\\.{0,}\\s{0,})\"r\""};
 
   input.open("stupid.txt");
 
@@ -110,8 +133,12 @@ int main() {
     curline = boost::regex_replace(curline, getNumbers, doMath); // :numbers
 
     curline = boost::regex_replace(curline, getUniStrings, fixUniStrings);
+    curline = boost::regex_replace(curline, getConcatChar, fixConcatChar);  
     curline = boost::regex_replace(curline, stringCharRegex, fixStringChar);
+    curline = boost::regex_replace(curline, getConcatChar, fixConcatChar);  
     curline = boost::regex_replace(curline, stringCharRegex, fixStringChar);
+
+    curline = boost::regex_replace(curline, getConcatChar, fixConcatChar);  
 
     output << curline << "\n";
   }

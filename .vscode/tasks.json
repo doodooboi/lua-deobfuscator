@@ -10,7 +10,7 @@
         "${file}",
         "-I${workspaceFolder}/boost_1_81_0",
         "-o",
-        "${fileDirname}/${fileBasenameNoExtension}2.exe"
+        "${fileDirname}/linux-${fileBasenameNoExtension}"
       ],
       "options": {
         "cwd": "${fileDirname}"

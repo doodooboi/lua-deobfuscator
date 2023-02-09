@@ -1,6 +1,6 @@
 #include <fstream>
 #include <string>
-#include <filesystem>
+//#include <filesystem>
 #include "boost/regex.hpp"
 
 #include <iostream>
@@ -68,19 +68,19 @@ std::string fixUniStrings(const boost::smatch &match) {
 
 std::string fixStringChar(const boost::smatch &match) {
   std::string s = match[0].str();
-  std::string output;
   std::size_t start {s.find('(') + 1};
   std::size_t end {s.find(')')};
 
+  std::string output {""};
   std::vector<std::string> splitted {split(s.substr(start, end-start), ',')};
 
   for (unsigned short int i = 0; i < splitted.size(); i++) {
     output += static_cast<char>(std::stoi(splitted[i]));
   }
 
-  //std::cout << output << std::endl;
+  std::cout << s << " :-> " << output << std::endl;
 
-  return output; //"\"" + output + "\"";
+  return "\"" + output + "\"";
 }
 
 int main() {
@@ -94,7 +94,7 @@ int main() {
   boost::regex getNumbers {"(\\-|)[0-9]+(\\s+)[\\+|\\-|\\*|\\/](\\s+)[0-9]*"}; // use this after hex -> int
   boost::regex removeParenthesisReg {"\\([0-9]{1,}\\)"};
   boost::regex getUniStrings {"\\\\(\\d)+"};
-  boost::regex stringCharRegex {"(_ENV\\[\"string\"\\]\\[\"char\"\\]|string.char)\\((.+?(?=\\)))\\)"};
+  boost::regex stringCharRegex {"((_ENV\\[\"string\"\\]\\[\"char\"\\]|string.char)\\((.+?(?=\\)))\\))"};
 
   input.open("stupid.txt");
 
@@ -111,6 +111,7 @@ int main() {
 
     curline = boost::regex_replace(curline, getUniStrings, fixUniStrings);
     curline = boost::regex_replace(curline, stringCharRegex, fixStringChar);
+    curline = boost::regex_replace(curline, stringCharRegex, fixStringChar);
 
     output << curline << "\n";
   }
@@ -120,8 +121,8 @@ int main() {
   output.close();
   input.close();
 
-  std::cout << "Input: " << std::filesystem::file_size("stupid.txt") << std::endl;
-  std::cout << "Output: " << std::filesystem::file_size("Output-4.txt") << std::endl;
+  // std::cout << "Input: " << std::filesystem::file_size("stupid.txt") << std::endl;
+  // std::cout << "Output: " << std::filesystem::file_size("Output-4.txt") << std::endl;
   
   return 0;
 }
